@@ -1,15 +1,25 @@
-APPLI = jap-mhd
-SRC = mhd.cpp
-
-CC = gcc
+CC = g++
 CFLAGS = -Wall -Wextra
-OBJ = ${SRC:.cpp=.o}
+SRC = mhd.cpp jap_mhd.cpp
 
-.c.o :
-	$(CC) $(CFLAGS) -c $<
+.DEFAULT_GOAL := all
 
-$(APPLI): $(OBJ)
-	$(CC) -o $(APPLI) $(OBJ) $(CFLAGS)
+all: mhd_1D mhd_2D
+
+%.o: %.c %.h
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+mhd_1D.o: 
+	gcc -c -o $@ mhd.cpp -D_1D
+
+mhd_2D.o:
+	gcc -c -o $@ mhd.cpp -D_2D
+
+mhd_1D: mhd_1D.o
+	$(CC) -o $@ $^ $(CFLAGS) -D_1D
+
+mhd_2D: mhd_2D.o
+	$(CC) -o $@ $^ $(CFLAGS) -D_2D
 
 clean :
-	@rm -f $(APPLI) *.o *~
+	@rm -f mhd_1D mhd_2D *.o *~

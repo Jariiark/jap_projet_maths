@@ -1,22 +1,6 @@
 // vim: set sw=4 ts=4 sts=4 et tw=78 foldmarker={{{,}}} foldlevel=0 foldmethod=marker spell:
 
-// cas {{{
-//#define _1D
-#define _2D
-// }}}
-
-// include {{{
-#include <math.h>
-#include <time.h>
-#include <string>
-#include <sstream>
-#include <fstream>
-#include <iostream>
-#include <cstdio>
-#include <cstdlib>
-
-using namespace std;
-// }}}
+#include "jap_mhd.h"
 
 // define {{{
 
@@ -67,9 +51,6 @@ using namespace std;
 #define _GAM (1.666666666666)
 #define _PI (3.14159265359)
 #define _CH (5)
-
-typedef float real;
-
 // }}}
 
 // wexact {{{
