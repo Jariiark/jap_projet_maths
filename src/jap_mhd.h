@@ -20,8 +20,8 @@ void conservatives(real *, real *);
 
 void Ref2PhysMap(real *, real *, real *, real *);
 
-void InitData(real);
+void InitData(real *);
 
-void TimeStepCPU(real, real *);
+void TimeStepCPU(real *, real *);
 
 #endif

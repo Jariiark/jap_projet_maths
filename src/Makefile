@@ -9,16 +9,16 @@ all: mhd_1D mhd_2D
 %.o: %.c %.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-mhd_1D.o: 
-	gcc -c -o $@ mhd.cpp -D_1D
+mhd_1D.o:
+	$(CC) -c -o $@ mhd.cpp -D_1D
 
 mhd_2D.o:
-	gcc -c -o $@ mhd.cpp -D_2D
+	$(CC) -c -o $@ mhd.cpp -D_2D
 
-mhd_1D: mhd_1D.o
+mhd_1D: mhd_1D.o jap_mhd.o
 	$(CC) -o $@ $^ $(CFLAGS) -D_1D
 
-mhd_2D: mhd_2D.o
+mhd_2D: mhd_2D.o jap_mhd.o
 	$(CC) -o $@ $^ $(CFLAGS) -D_2D
 
 clean :
