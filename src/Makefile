@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -Wall -Wextra
+CFLAGS = -Wall -Wextra -lm
 SRC = mhd.cpp jap_mhd.cpp
 
 .DEFAULT_GOAL := all
