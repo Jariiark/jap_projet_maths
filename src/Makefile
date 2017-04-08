@@ -4,7 +4,7 @@ SRC = mhd.cpp jerrikk0-mhd.cpp
 
 .DEFAULT_GOAL := all
 
-all: mhd_1D mhd_2D
+all: mhd-1D mhd-2D
 
 %.o: %.c %.h
 	$(CC) -c -o $@ $< $(CFLAGS)

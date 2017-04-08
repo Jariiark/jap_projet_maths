@@ -19,3 +19,8 @@ void TimeStepCPU(real *, real *)
 {
 	
 }
+
+void primitives(real *, real *)
+{
+	
+}
