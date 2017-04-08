@@ -1,7 +1,6 @@
-#ifndef JAP_MHD_H
-#define JAP_MHD_H
+#ifndef JERRIKK0_MHD_H
+#define JERRIKK0_MHD_H
 
-// include {{{
 #include <math.h>
 #include <time.h>
 #include <string>
@@ -12,7 +11,15 @@
 #include <cstdlib>
 
 using namespace std;
-// }}}
+
+#define Min(a,b) (((a) < (b)) ? (a) : (b))
+#define Max(a,b) (((a) > (b)) ? (a) : (b))
+#define Abs(a) ((a) > (0) ? (a) : (-a))
+
+//#define _GAM (2)
+#define _GAM (1.666666666666)
+#define _PI (3.14159265359)
+#define _CH (5)
 
 typedef float real;
 

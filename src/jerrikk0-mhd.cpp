@@ -1,4 +1,4 @@
-#include "jap_mhd.h"
+#include "jerrikk0-mhd.h"
 
 void conservatives(real *, real *)
 {
