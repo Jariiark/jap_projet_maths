@@ -35,7 +35,12 @@ void InitData(real *)
 
 }
 
-void TimeStepCPU(real *, real *)
+void TimeStepCPU_1D(real *, real *)
 {
+	
+}
 
+void TimeStepCPU_2D(real *, real *)
+{
+	
 }
