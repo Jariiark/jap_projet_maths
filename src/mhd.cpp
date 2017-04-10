@@ -423,17 +423,17 @@ void InitData(real * Wh1)
 	real x, y, xx, yy;
 	real W[9];
 
-	/*for (i=0; i<_LONGUEURX; i++) {
-		for(j=0; j<_LONGUEURY; j++){
+	for (int i=0; i<_LONGUEURX; i++) {
+		for(int j=0; j<_LONGUEURY; j++){
 			xx = i*1.0/_NXTRANSBLOCK;
 			yy = j*1.0/_NYTRANSBLOCK;
 			Ref2PhysMap(&xx, &yy, &x, &y);
 			Wexact(&x, &y, W);
-			for(iv=0;iv<_M;iv++){
-				Wh1[iv*_LONGUEURX*_LONGUEURY+i+j]=W[iv];
+			for(int iv=0;iv<_M;iv++){
+				Wh1[iv*(int)_LONGUEURX*(int)_LONGUEURY+i+j]=W[iv];
 			}
 		}
-	}*/
+	}
 	
 	/*for (int iv = 0; iv < 4; ++iv) {
 		for (int i = 0; i < _M; ++i) {
@@ -447,7 +447,7 @@ void InitData(real * Wh1)
 		}
 	}*/
 	
-	for (int iv = 0; iv < 4; ++iv) {
+	/*for (int iv = 0; iv < 4; ++iv) {
 		for (int i = 0; i < _M; ++i) {
 			xx = (real)i * _M / _NXTRANSBLOCK;
 			yy = (real)i * _M / _NYTRANSBLOCK;
@@ -457,7 +457,7 @@ void InitData(real * Wh1)
 			
 			Wh1[iv * _M + i] = W[i];
 		}
-	}
+	}*/
 }
 
 int main(int argc, char const* argv[])
