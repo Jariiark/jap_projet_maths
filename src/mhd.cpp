@@ -420,15 +420,10 @@ void PlotGmshBinary(real Wn1[_NXTRANSBLOCK * _NYTRANSBLOCK * _M])
 */
 void InitData(real * Wh1)
 {
-	int iv;
-	real x;
-	real y;
-	real xx;
-	real yy;
-	int i, j;
+	real x, y, xx, yy;
 	real W[9];
 
-	for (i=0; i<_LONGUEURX; i++) {
+	/*for (i=0; i<_LONGUEURX; i++) {
 		for(j=0; j<_LONGUEURY; j++){
 			xx = i*1.0/_NXTRANSBLOCK;
 			yy = j*1.0/_NYTRANSBLOCK;
@@ -437,6 +432,30 @@ void InitData(real * Wh1)
 			for(iv=0;iv<_M;iv++){
 				Wh1[iv*_LONGUEURX*_LONGUEURY+i+j]=W[iv];
 			}
+		}
+	}*/
+	
+	/*for (int iv = 0; iv < 4; ++iv) {
+		for (int i = 0; i < _M; ++i) {
+			xx = (real)_LONGUEURX / i / _NXTRANSBLOCK;
+			yy = (real)_LONGUEURY / i / _NXTRANSBLOCK;
+			
+			Ref2PhysMap(&xx, &yy, &x, &y);
+			Wexact(&x, &y, W);
+			
+			Wh1[iv * _M + i] = W[i];
+		}
+	}*/
+	
+	for (int iv = 0; iv < 4; ++iv) {
+		for (int i = 0; i < _M; ++i) {
+			xx = (real)i * _M / _NXTRANSBLOCK;
+			yy = (real)i * _M / _NYTRANSBLOCK;
+			
+			Ref2PhysMap(&xx, &yy, &x, &y);
+			Wexact(&x, &y, W);
+			
+			Wh1[iv * _M + i] = W[i];
 		}
 	}
 }
