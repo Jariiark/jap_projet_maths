@@ -2,26 +2,6 @@
 
 #include "jerrikk0-mhd.h"
 
-// Dans ce cas sequentiel, pour modifier le nombre de mailles il ne faut
-// modifier que _NBWORKSX et _NBWORKSY
-
-#define _M (9)										//Number of conservative variable
-#define _TMAX (1)
-#define _GAP (0)									// taille du recouvrement entre les work groupe
-#define _TRANSBLOCK 1								// size of the cached transposed block
-#define _NBWORKSX (1<<7)							// number of work-items in a work-group
-#define _NBLOCKSX (1)								// number of work-groups
-#define _NX (_NBLOCKSX*(_NBWORKSX-2*_GAP)+2*_GAP)	// number of volume finite
-#define _NXTRANSBLOCK ( (_NX%_TRANSBLOCK==0)? _NX : _NX+_TRANSBLOCK-_NX%_TRANSBLOCK )
-
-#define _NBWORKSY (1<<7)
-#define _NBLOCKSY (1)
-#define _NY (_NBLOCKSY*(_NBWORKSY-2*_GAP)+2*_GAP)
-#define _NYTRANSBLOCK ( (_NY%_TRANSBLOCK==0)? _NY : _NY+_TRANSBLOCK-_NY%_TRANSBLOCK )
-#define _CFL (0.5)
-#define _SPLIT (1)									// affiche 1 maille sur _SPLIT dans le fichier .msh
-
-
 // wexact
 void Wexact(real* x, real* y, real* W)
 {
