@@ -426,17 +426,18 @@ void InitData(real * Wh1)
 	real xx;
 	real yy;
 	int i, j;
+	real W[9];
 
-	for(iv=0;iv<_M;iv++){
-		for (i=iv*_LONGUEURX; i<(iv+1)*_LONGUEURX; i++) {
-			for(j=iv*_Y; j<(iv+1)*_LONGUEURY; j++){
-				xx = i*1.0/_NXTRANSBLOCK;
-				yy = j*1.0/_NYTRANSBLOCK;
-				Ref2PhysMap(xx, yy, x, y);
-				Wh1[i+j]=Wexact(x,y);
+	for (i=0; i<_LONGUEURX; i++) {
+		for(j=0; j<_LONGUEURY; j++){
+			xx = i*1.0/_NXTRANSBLOCK;
+			yy = j*1.0/_NYTRANSBLOCK;
+			Ref2PhysMap(&xx, &yy, &x, &y);
+			Wexact(&x, &y, W);
+			for(iv=0;iv<_M;iv++){
+				Wh1[iv*_LONGUEURX*_LONGUEURY+i+j]=W[iv];
 			}
 		}
-		Wh1[_X*_Y]=W[iv];
 	}
 }
 

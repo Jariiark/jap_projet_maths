@@ -30,9 +30,6 @@ void Ref2PhysMap(real *xx, real *yy, real *x, real *y)
 	*y = *yy * _LONGUEURY + _YMIN;
 }
 
-
-
-
 void TimeStepCPU_1D(real *, real *)
 {
 

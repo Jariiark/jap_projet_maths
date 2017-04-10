@@ -11,12 +11,12 @@
 	#include <cstdlib>
 
 	using namespace std;
-	
+
 	// define {{{
-	
+
 	// Dans ce cas sequentiel, pour modifier le nombre de mailles il ne faut
 	// modifier que _NBWORKSX et _NBWORKSY
-	
+
 	#define _M (9)										//Number of conservative variable
 	#define _TMAX (1)
 	#define _GAP (0)									// taille du recouvrement entre les work groupe
@@ -25,7 +25,7 @@
 	#define _NBLOCKSX (1)								// number of work-groups
 	#define _NX (_NBLOCKSX*(_NBWORKSX-2*_GAP)+2*_GAP)	// number of volume finite
 	#define _NXTRANSBLOCK ( (_NX%_TRANSBLOCK==0)? _NX : _NX+_TRANSBLOCK-_NX%_TRANSBLOCK )
-	
+
 	#define _NBWORKSY (1<<7)
 	#define _NBLOCKSY (1)
 	#define _NY (_NBLOCKSY*(_NBWORKSY-2*_GAP)+2*_GAP)
@@ -41,9 +41,9 @@
 	#define _GAM (1.666666666666)
 	#define _PI (3.14159265359)
 	#define _CH (5)
-	
+
 	// }}}
-	
+
 	// define selon 1D ou 2D {{{
 	#ifdef _1D
 		#define _LONGUEURX (10)							//Longueur du domaine suivant x
@@ -52,10 +52,10 @@
 		#define _XMAX (5)
 		#define _YMIN (-5)
 		#define _YMAX (5)
-	
+
 		#define TimeStepCPU TimeStepCPU_1D
 	#endif
-	
+
 	#ifdef _2D
 		// Orzag Tang
 		#define _LONGUEURX (6.2831853)					//Longueur du domaine suivant x
@@ -64,17 +64,16 @@
 		#define _XMAX (6.2831853)
 		#define _YMIN (0)
 		#define _YMAX (6.2831853)
-	
+
 		#define TimeStepCPU TimeStepCPU_2D
 	#endif
-	
+
 	// }}}
 
 	typedef float real;
 
 	void conservatives(real *, real *);
 	void Ref2PhysMap(real *, real *, real *, real *);
-	void InitData(real *);
 	void TimeStepCPU(real *, real *);
 	void primitives(real *, real *);
 
