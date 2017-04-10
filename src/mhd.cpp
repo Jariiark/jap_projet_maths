@@ -2,6 +2,8 @@
 
 #include "jerrikk0-mhd.h"
 
+
+
 // wexact
 void Wexact(real* x, real* y, real* W)
 {
@@ -410,7 +412,33 @@ void PlotGmshBinary(real Wn1[_NXTRANSBLOCK * _NYTRANSBLOCK * _M])
 	fic.close();
 }
 
+/*
+1 rô = conservatives(_GAM);
+2 u(x)
+3 P
+4	u(y)
+*/
+void InitData(real * Wh1)
+{
+	int iv;
+	real x;
+	real y;
+	real xx;
+	real yy;
+	int i, j;
 
+	for(iv=0;iv<_M;iv++){
+		for (i=iv*_LONGUEURX; i<(iv+1)*_LONGUEURX; i++) {
+			for(j=iv*_Y; j<(iv+1)*_LONGUEURY; j++){
+				xx = i*1.0/_NXTRANSBLOCK;
+				yy = j*1.0/_NYTRANSBLOCK;
+				Ref2PhysMap(xx, yy, x, y);
+				Wh1[i+j]=Wexact(x,y);
+			}
+		}
+		Wh1[_X*_Y]=W[iv];
+	}
+}
 
 int main(int argc, char const* argv[])
 {
