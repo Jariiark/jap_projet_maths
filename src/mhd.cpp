@@ -421,11 +421,11 @@ int main(int argc, char const* argv[])
 	int iter = 0;
 	real dtt = 0;
 
-	for (real t = 0; t < _TMAX; t += dtt) {
+	/*for (real t = 0; t < _TMAX; t += dtt) {
 		cout << "Iter=" << iter++ << endl;;
 		TimeStepCPU(Wn1,&dtt);
 		cout << t << endl;
-	}
+	}*/
 
 	#ifdef _1D
 		GnuPlot(Wn1);
