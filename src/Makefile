@@ -4,7 +4,11 @@ SRC = mhd.cpp jerrikk0-mhd.cpp
 
 .DEFAULT_GOAL := all
 
-all: mhd-1D mhd-2D
+TARGET-1D = mhd-1D
+TARGET-2D = mhd-2D
+TARGETS = $(TARGET-1D) $(TARGET-2D)
+
+all: $(TARGETS)
 
 %.o: %.c %.h
 	$(CC) -c -o $@ $< $(CFLAGS)
@@ -21,11 +25,12 @@ mhd-1D.o: mhd.cpp jerrikk0-mhd.h
 mhd-2D.o: mhd.cpp jerrikk0-mhd.h
 	$(CC) -c -o $@ mhd.cpp -D_2D
 
-mhd-1D: mhd-1D.o jerrikk0-mhd-1D.o
+$(TARGET-1D): mhd-1D.o jerrikk0-mhd-1D.o
 	$(CC) -o $@ $^ $(CFLAGS) -D_1D
 
-mhd-2D: mhd-2D.o jerrikk0-mhd-2D.o
+$(TARGET-2D): mhd-2D.o jerrikk0-mhd-2D.o
 	$(CC) -o $@ $^ $(CFLAGS) -D_2D
 
 clean :
-	@rm -f mhd-1D mhd-2D *.o *~
+	@rm -f $(TARGETS) *.o *~ clmhd.msh gdat
+	@rm -rf RESU/
