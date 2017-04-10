@@ -24,9 +24,10 @@ void conservatives(real * Y, real * W)
 	W[5] = (Y[5]+1/2*(Y[6]*Y[6]+Y[7]*Y[7]+Y[8]*Y[8]))/(_GAM-1)+Y[1]/2*(Y[2]*Y[2]+Y[3]*Y[3]+Y[4]*Y[4]);
 }
 
-void Ref2PhysMap(real *, real *, real *, real *)
+void Ref2PhysMap(real *xx, real *yy, real *x, real *y)
 {
-
+	*x = *xx * (_XMIN + _XMAX) / 2. + _XMIN;
+	*y = *yy * (_YMIN + _YMAX) / 2. + _YMIN;
 }
 
 void InitData(real *)
