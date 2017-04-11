@@ -47,7 +47,7 @@ void conservatives(real * Y, real * W)
  3 P
  4	u(y)
  */
-void InitData(real *Wh1)
+void InitData(real *Wn1)
 {
 	real x, y, xx, yy;
 	real W[_M], Y[_M], consGam[_M];
@@ -60,7 +60,7 @@ void InitData(real *Wh1)
 // 			Ref2PhysMap(&xx, &yy, &x, &y);
 // 			Wexact(&x, &y, W);
 // 			for(int iv=0;iv<_M;iv++){
-// 				Wh1[iv*(int)_LONGUEURX*(int)_LONGUEURY+i+j]=W[iv];
+// 				Wn1[iv*(int)_LONGUEURX*(int)_LONGUEURY+i+j]=W[iv];
 // 			}
 // 		}
 // 	}
@@ -75,7 +75,7 @@ void InitData(real *Wh1)
 			Wexact(&x, &y, W);
 			
 			for (int k = 0; k < _M; ++k) {
-				Wh1[i + 0 * _NXTRANSBLOCK * _NYTRANSBLOCK + j * _NXTRANSBLOCK] = W[i];
+				Wn1[i + 0 * _NXTRANSBLOCK * _NYTRANSBLOCK + j * _NXTRANSBLOCK] = W[i];
 			}
 		}
 	}
@@ -83,9 +83,19 @@ void InitData(real *Wh1)
 // }}}
 
 // TimeStepCPU {{{
-void TimeStepCPU_1D(real *Wh1, real *dtt)
+void TimeStepCPU_1D(real *Wn1, real *dtt)
 {
+	real W[_M], f[_M];
 	
+	for(int j = 0; j < _NY; j++) {
+		for(int i = 0; i < _NX; i++) {
+			for (int k = 0; k < _M; ++k) {
+				W[k] = Wn1[i + k * _NXTRANSBLOCK * _NYTRANSBLOCK + j * _NXTRANSBLOCK];
+				flux(W, dtt, f);
+				Wn1[i + k * _NXTRANSBLOCK * _NYTRANSBLOCK + j * _NXTRANSBLOCK] = f[k];
+			}
+		}
+	}
 }
 
 void TimeStepCPU_2D(real *, real *)
