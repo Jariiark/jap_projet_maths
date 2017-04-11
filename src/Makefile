@@ -13,16 +13,16 @@ all: $(TARGETS)
 %.o: %.c %.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 	
-jerrikk0-mhd-1D.o: jerrikk0-mhd.cpp jerrikk0-mhd.h
+jerrikk0-mhd-1D.o: jerrikk0-mhd.cpp mhd.h jerrikk0-mhd.h
 	$(CC) -c -o $@ jerrikk0-mhd.cpp -D_1D
 
-jerrikk0-mhd-2D.o: jerrikk0-mhd.cpp jerrikk0-mhd.h
+jerrikk0-mhd-2D.o: jerrikk0-mhd.cpp mhd.h jerrikk0-mhd.h
 	$(CC) -c -o $@ jerrikk0-mhd.cpp -D_2D
 	
-mhd-1D.o: mhd.cpp jerrikk0-mhd.h
+mhd-1D.o: mhd.cpp mhd.h jerrikk0-mhd.h
 	$(CC) -c -o $@ mhd.cpp -D_1D
 
-mhd-2D.o: mhd.cpp jerrikk0-mhd.h
+mhd-2D.o: mhd.cpp mhd.h jerrikk0-mhd.h
 	$(CC) -c -o $@ mhd.cpp -D_2D
 
 $(TARGET-1D): mhd-1D.o jerrikk0-mhd-1D.o

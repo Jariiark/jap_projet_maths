@@ -2,9 +2,7 @@
 
 #include "jerrikk0-mhd.h"
 
-
-
-// wexact
+// wexact {{{
 void Wexact(real* x, real* y, real* W)
 {
 	#ifdef _1D
@@ -105,8 +103,9 @@ void Wexact(real* x, real* y, real* W)
 		conservatives(Y, W);
 	#endif
 }
+// }}}
 
-// flux
+// flux {{{
 void flux(real* W, real* vn, real* flux)
 {
 	real gam = _GAM;
@@ -133,8 +132,9 @@ void flux(real* W, real* vn, real* flux)
 	flux[7] = -bn*Y[1] + un*Y[7] + Y[8]*vn[0];
 	flux[8] = _CH*_CH * bn;
 }
+// }}}
 
-// gnuplot
+// gnuplot {{{
 void GnuPlot(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M])
 {
 	system("if [ ! -d RESU ] ; then mkdir RESU; fi");
@@ -211,8 +211,9 @@ void GnuPlot(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M])
 
 	system("gnuplot gdat");
 }
+// }}}
 
-// Gmsh
+// Gmsh {{{
 void PlotGmshBinary(real Wn1[_NXTRANSBLOCK * _NYTRANSBLOCK * _M])
 {
 	ofstream fic("clmhd.msh", ios::binary);
@@ -411,54 +412,8 @@ void PlotGmshBinary(real Wn1[_NXTRANSBLOCK * _NYTRANSBLOCK * _M])
 
 	fic.close();
 }
+// }}}
 
-/*
-1 rô = conservatives(_GAM);
-2 u(x)
-3 P
-4	u(y)
-*/
-void InitData(real * Wh1)
-{
-	real x, y, xx, yy;
-	real W[9];
-
-	for (int i=0; i<_LONGUEURX; i++) {
-		for(int j=0; j<_LONGUEURY; j++){
-			xx = i*1.0/_NXTRANSBLOCK;
-			yy = j*1.0/_NYTRANSBLOCK;
-			Ref2PhysMap(&xx, &yy, &x, &y);
-			Wexact(&x, &y, W);
-			for(int iv=0;iv<_M;iv++){
-				Wh1[iv*(int)_LONGUEURX*(int)_LONGUEURY+i+j]=W[iv];
-			}
-		}
-	}
-	
-	/*for (int iv = 0; iv < 4; ++iv) {
-		for (int i = 0; i < _M; ++i) {
-			xx = (real)_LONGUEURX / i / _NXTRANSBLOCK;
-			yy = (real)_LONGUEURY / i / _NXTRANSBLOCK;
-			
-			Ref2PhysMap(&xx, &yy, &x, &y);
-			Wexact(&x, &y, W);
-			
-			Wh1[iv * _M + i] = W[i];
-		}
-	}*/
-	
-	/*for (int iv = 0; iv < 4; ++iv) {
-		for (int i = 0; i < _M; ++i) {
-			xx = (real)i * _M / _NXTRANSBLOCK;
-			yy = (real)i * _M / _NYTRANSBLOCK;
-			
-			Ref2PhysMap(&xx, &yy, &x, &y);
-			Wexact(&x, &y, W);
-			
-			Wh1[iv * _M + i] = W[i];
-		}
-	}*/
-}
 
 int main(int argc, char const* argv[])
 {
@@ -467,13 +422,13 @@ int main(int argc, char const* argv[])
 	InitData(Wn1);
 
 	int iter = 0;
-	real dtt = 0;
+	real dtt = 0.01;
 
-	/*for (real t = 0; t < _TMAX; t += dtt) {
+	for (real t = 0; t < _TMAX; t += dtt) {
 		cout << "Iter=" << iter++ << endl;;
 		TimeStepCPU(Wn1,&dtt);
 		cout << t << endl;
-	}*/
+	}
 
 	#ifdef _1D
 		GnuPlot(Wn1);
