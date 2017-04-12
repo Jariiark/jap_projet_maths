@@ -15,9 +15,9 @@ void primitives(real * Y, real * W)
 {
 	Y[0] = W[0];
 	Y[1] = W[1]/ W[0];
-	Y[2] = (_GAM - 1) * (W[2] - W[0]/2 * ((W[1]/W[0] * W[1]/W[0]) + (W[3]/W[0] * W[3]/W[0]) + (W[4]/W[0] * W[4]/W[0]) - 1./2 * (W[5]*W[5] + W[6]*W[6] + W[7]*W[7])));
 	Y[3] = W[3]/ W[0];
 	Y[4] = W[4]/ W[0];
+	Y[2] = (_GAM - 1) * (W[2] - W[0]/2 * ((Y[1]*Y[1]) + (Y[3]*Y[3] + Y[4]*Y[4]) - 1./2 * (W[5]*W[5] + W[6]*W[6] + W[7]*W[7])));
 	Y[5] = W[5];
 	Y[6] = W[6];
 	Y[7] = W[7];
@@ -60,26 +60,65 @@ void InitData(real *Wn1)
 			Ref2PhysMap(&xx, &yy, &x, &y);
 			Wexact(&x, &y, W);
 			
-			for (int k = 0; k < _M; ++k) {
+			for (int k = 0; k < _M; ++k)
 				Wn1[i + k * _NXTRANSBLOCK * _NYTRANSBLOCK + j * _NXTRANSBLOCK] = W[k];
-			}
 		}
 	}
+	
+// 	for(int j = 0; j < _NYTRANSBLOCK; j++) {
+// 		for(int i = 0; i < _NXTRANSBLOCK; i++) {
+// 			real xx = ((real)i) / _NXTRANSBLOCK;
+// 			real yy = ((real)i) / _NXTRANSBLOCK;
+// 			real x, y;
+// 			
+// 			Ref2PhysMap(&xx, &yy, &x, &y);
+// 			Wexact(&x, &y, W);
+// 			
+// 			for (int k = 0; k < _M; ++k)
+// 				Wn1[i + k * _NXTRANSBLOCK * _NYTRANSBLOCK + j * _NXTRANSBLOCK] = W[k];
+// 		}
+// 	}
 }
 // }}}
 
 // TimeStepCPU {{{
 void TimeStepCPU_1D(real *Wn1, real *dtt)
 {
-	real W[_M], f[_M];
+	real WL[_M];
+	real WR[_M];
+	real WM[_M];
+	real fluxWL[_M];
+	real fluxWR[_M];
 	real vnX[3] = {1, 0, 0};
+	real dx = (_XMAX - _XMIN) / _NX;
+	real xMin = _XMIN;
+	real xMax = _XMAX;
+	real yZero = 0;
 	
-	for(int j = 0; j < _NY; j++) {
-		for(int i = 0; i < _NX; i++) {
+	for (int j = 0; j < _NYTRANSBLOCK; ++j) {
+		for (int i = 0; i < _NXTRANSBLOCK; ++i) {
 			for (int k = 0; k < _M; ++k) {
-				W[k] = Wn1[i + k * _NXTRANSBLOCK * _NYTRANSBLOCK + j * _NXTRANSBLOCK];
-				flux(W, vnX, f);
-				Wn1[i + k * _NXTRANSBLOCK * _NYTRANSBLOCK + j * _NXTRANSBLOCK] = f[k];
+				
+				if (i <= 0) {
+					Wexact(&xMin, &yZero, WL);
+					WR[k] = Wn1[i + 1 + k * _NXTRANSBLOCK * _NYTRANSBLOCK + j * _NXTRANSBLOCK];
+				}
+				else if (i >= _NXTRANSBLOCK) {
+					WL[k] = Wn1[i - 1 + k * _NXTRANSBLOCK * _NYTRANSBLOCK + j * _NXTRANSBLOCK];
+					Wexact(&xMax, &yZero, WR);
+				}
+				else {
+					WL[k] = Wn1[i - 1 + k * _NXTRANSBLOCK * _NYTRANSBLOCK + j * _NXTRANSBLOCK];
+					WL[k] = Wn1[i + 1 + k * _NXTRANSBLOCK * _NYTRANSBLOCK + j * _NXTRANSBLOCK];
+				}
+			
+				flux(WL, vnX, fluxWL);
+				flux(WR, vnX, fluxWR);
+				
+				for (int k = 0; k < _M; ++k) {
+					int n = i + k * _NXTRANSBLOCK * _NYTRANSBLOCK + j * _NXTRANSBLOCK;
+					Wn1[n] = Wn1[n] - (1./2 * (real)(fluxWR[k] + fluxWL[k]) - _CH/2 * (WR[k] - WL[k]));
+				}
 			}
 		}
 	}
