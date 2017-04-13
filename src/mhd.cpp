@@ -8,47 +8,47 @@ void Wexact(real* x, real* y, real* W)
 	#ifdef _1D
 		real YL[_M], YR[_M], WR[_M], WL[_M];
 
-	//	// Test de Choc fort
-	//	YL[0] = 3;
-	//	YL[1] = 1.3;
-	//	YL[3] = 0;
-	//	YL[4] = 0;
-	//	YL[2] = 3;
-	//	YL[5] = 1;
-	//	YL[6] = 1;
-	//	YL[7] = 1.5;
-	//	YL[8] = 0;
-	//
-	//	YR[0] = 1;
-	//	YR[1] = 1.3;
-	//	YR[3] = 0;
-	//	YR[4] = 0;
-	//	YR[2] = 1;
-	//	YR[5] = 0.0707372016677029;
-	//	YR[6] = 0.9974949866040544;
-	//	YR[7] = 1.5;
-	//	YR[8] = 0;
+// 		// Test de Choc fort
+// 		YL[0] = 3;
+// 		YL[1] = 1.3;
+// 		YL[3] = 0;
+// 		YL[4] = 0;
+// 		YL[2] = 3;
+// 		YL[5] = 1;
+// 		YL[6] = 1;
+// 		YL[7] = 1.5;
+// 		YL[8] = 0;
+// 	
+// 		YR[0] = 1;
+// 		YR[1] = 1.3;
+// 		YR[3] = 0;
+// 		YR[4] = 0;
+// 		YR[2] = 1;
+// 		YR[5] = 0.0707372016677029;
+// 		YR[6] = 0.9974949866040544;
+// 		YR[7] = 1.5;
+// 		YR[8] = 0;
 
-	//	// Test de Brio et Wu
-	//	YL[0] = 1;
-	//	YL[1] = 0;
-	//	YL[3] = 0;
-	//	YL[4] = 0;
-	//	YL[2] = 1;
-	//	YL[5] = 1;
-	//	YL[6] = 0;
-	//	YL[7] = 0.75;
-	//	YL[8] = 0;
-	//
-	//	YR[0] = 0.125;
-	//	YR[1] = 0;
-	//	YR[3] = 0;
-	//	YR[4] = 0;
-	//	YR[2] = 0.1;
-	//	YR[5] = -1;
-	//	YR[6] = 0;
-	//	YR[7] = 0.75;
-	//	YR[8] = 0;
+// 		// Test de Brio et Wu
+// 		YL[0] = 1;
+// 		YL[1] = 0;
+// 		YL[3] = 0;
+// 		YL[4] = 0;
+// 		YL[2] = 1;
+// 		YL[5] = 1;
+// 		YL[6] = 0;
+// 		YL[7] = 0.75;
+// 		YL[8] = 0;
+// 	
+// 		YR[0] = 0.125;
+// 		YR[1] = 0;
+// 		YR[3] = 0;
+// 		YR[4] = 0;
+// 		YR[2] = 0.1;
+// 		YR[5] = -1;
+// 		YR[6] = 0;
+// 		YR[7] = 0.75;
+// 		YR[8] = 0;
 
 		//Test de Dai et Woodward
 		YL[0] = 1.08;
@@ -422,12 +422,12 @@ int main(int argc, char const* argv[])
 	InitData(Wn1);
 
 	int iter = 0;
-	real dtt = 0.01;
-
+	real dtt = 0;
+	char cc;
+	
 	for (real t = 0; t < _TMAX; t += dtt) {
-		cout << "Iter=" << iter++ << endl;;
-		TimeStepCPU(Wn1,&dtt);
-		cout << t << endl;
+		cout << "Iter=" << iter++ << " | t=" << t << endl;
+		TimeStepCPU(Wn1, &dtt);
 	}
 
 	#ifdef _1D

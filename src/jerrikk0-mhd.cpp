@@ -11,7 +11,7 @@ void Ref2PhysMap(real *xx, real *yy, real *x, real *y)
 // }}}
 
 // primitives {{{
-void primitives(real * Y, real * W)
+void primitives(real *W, real *Y)
 {
 	Y[0] = W[0];
 	Y[1] = W[1]/ W[0];
@@ -26,7 +26,7 @@ void primitives(real * Y, real * W)
 // }}}
 
 // conservatives {{{
-void conservatives(real * Y, real * W)
+void conservatives(real *Y, real *W)
 {
 	W[0] = Y[0];
 	W[1] = Y[1] * Y[0];
@@ -81,6 +81,41 @@ void InitData(real *Wn1)
 }
 // }}}
 
+void printW(real *W, int n) {
+	for (int k = 0; k < n; ++k) {
+		cout << W[k] << " ";
+		
+		if(isnan(W[k]))
+			exit(1);
+	}
+	
+	cout << endl;
+}
+
+void printWM(real *Wn1, real *WM, int i, int j) {
+	for (int k = 0; k < _M; ++k) {
+		cout << WM[k] - Wn1[i + k * _NXTRANSBLOCK * _NYTRANSBLOCK + j * _NXTRANSBLOCK] << "    ";
+		
+		if (WM[k] - Wn1[i + k * _NXTRANSBLOCK * _NYTRANSBLOCK + j * _NXTRANSBLOCK] != 0)
+			exit(1);
+	}
+	
+	cout << endl;
+}
+
+void printWn12(real *Wn1, real *Wn2, int i) {
+	cout << Wn1[i] - Wn2[i] << " ";
+	
+	if (Wn1[i] - Wn2[i] != 0)
+		exit(1);
+}
+
+void vector(real *Wn1, int i, int j, real *W)
+{
+	for (int k = 0; k < _M; ++k)
+		W[k] = Wn1[i + k * _NXTRANSBLOCK * _NYTRANSBLOCK + j * _NXTRANSBLOCK];
+}
+
 void flux(real *WL, real *WR, real *vn, real *fluxLR)
 {
 	real fluxL[_M];
@@ -89,8 +124,8 @@ void flux(real *WL, real *WR, real *vn, real *fluxLR)
 	flux(WL, vn, fluxL);
 	flux(WR, vn, fluxR);
 	
-	for (int i = 0; i < _M; ++i) {
-		fluxLR[i] = 0.5 * (fluxL[i] + fluxR[i]) - _CH * 0.5 * (WR[i] - WL[i]);
+	for (int k = 0; k < _M; ++k) {
+		fluxLR[k] = 0.5 * (fluxL[k] + fluxR[k]) - _CH * 0.5 * (WR[k] - WL[k]);
 	}
 }
 
@@ -103,142 +138,129 @@ void TimeStepCPU_1D(real *Wn1, real *dtt)
 	real fluxLM[_M];
 	real fluxMR[_M];
 	real vnX[3] = {1, 0, 0};
-	real dx = (real)_LONGUEURX / _NBWORKSX;
-	real Wn2[_NX * _NY * _M];
+	real dx = _LONGUEURX * 1. / _NBWORKSX;
+	int NX = _NXTRANSBLOCK;
+	int NY = _NYTRANSBLOCK;
+	real Wn2[NX * NY * _M];
 	
 	*dtt = _CFL * dx / _CH;
-	//*dtt = .000001;
-	//cout << "dx= " << dx << endl << "dt= " << *dtt << endl;
 	
-	for (int j = 0; j < _NY; ++j) {
-		for (int i = 0; i < _NX; ++i) {
+	for (int j = 0; j < NY; ++j) {
+		for (int i = 0; i < NX; ++i) {
+			
+			vector(Wn1, i, j, WM);
+			
+			if (i == 0) {
+				real x = _XMIN, y = 0;
+				Wexact(&x, &y, WL);
+			} else {
+				vector(Wn1, i - 1, j, WL);
+			}
+			
+			if (i == NX - 1) {
+				real x = _XMAX, y = 0;
+				Wexact(&x, &y, WR);
+			}
+			else {
+				vector(Wn1, i + 1, j, WR);
+			}
+			
+			flux(WL, WM, vnX, fluxLM);
+			flux(WM, WR, vnX, fluxMR);
+			
 			for (int k = 0; k < _M; ++k) {
-				WM[k] = Wn1[i + k * _NX * _NY + j * _NX];
-				
-				if (i == 0) {
-					real xx = 1. / _NX * (i + 0.5);
-					real yy = 1. / _NY * (j + 0.5);
-					real x, y;
-					Ref2PhysMap(&xx, &yy, &x, &y);
-					
-					Wexact(&x, &y, WL);
-					//WL[k] = 0;
-					WR[k] = Wn1[i + 1 + k * _NX * _NY + j * _NX];
-				}
-				else if (i == _NX - 1) {
-					real xx = 1. / _NX * (i + 0.5);
-					real yy = 1. / _NY * (j + 0.5);
-					real x, y;
-					Ref2PhysMap(&xx, &yy, &x, &y);
-					
-					WL[k] = Wn1[i - 1 + k * _NX * _NY + j * _NX];
-					Wexact(&x, &y, WR);
-					//WR[k] = 0;
-				}
-				else {
-					WL[k] = Wn1[i - 1 + k * _NX * _NY + j * _NX];
-					WR[k] = Wn1[i + 1 + k * _NX * _NY + j * _NX];
-				}				
-				
-				flux(WL, WM, vnX, fluxLM);
-				flux(WM, WR, vnX, fluxMR);
-					
-				int n = i + k * _NX * _NY + j * _NX;
-				Wn2[n] = Wn1[n] - *dtt/dx * (fluxMR[n] - fluxLM[n]);
+				int n = i + k * NX * NY + j * NX;
+				Wn2[n] = WM[k] - (*dtt)/dx * (fluxMR[k] - fluxLM[k]);
 			}
 		}
 	}
 	
-	for (int i = 0; i < _NX * _NY * _M; ++i)
+	for (int i = 0; i < NX * NY * _M; ++i) {
 		Wn1[i] = Wn2[i];
+	}
 }
 
 void TimeStepCPU_2D(real *Wn1, real *dtt)
 {
-	real WL[_M];
 	real WM[_M];
+	real WL[_M];
+	real WR[_M];
 	real WU[_M];
 	real WD[_M];
-	real WR[_M];
 	real fluxLM[_M];
 	real fluxMR[_M];
-	real fluxUM[_M];
-	real fluxMD[_M];
+	real fluxDM[_M];
+	real fluxMU[_M];
 	real vnX[3] = {1, 0, 0};
-	real vnY[3] = {0, 1, 0};
-	real dx = (real)_LONGUEURX / _NBWORKSX;
-	real dy = (real)_LONGUEURY / _NBWORKSY;
-	real Wn2[_NX * _NY * _M];
+	real dx = _LONGUEURX * 1. / _NBWORKSX;
+	real dy = _LONGUEURY * 1. / _NBWORKSY;
+	int NX = _NXTRANSBLOCK;
+	int NY = _NYTRANSBLOCK;
+	real Wn2[NX * NY * _M];
 	
 	*dtt = _CFL * dx / _CH;
-	//*dtt = .000001;
-	//cout << "dx= " << dx << endl << "dt= " << *dtt << endl;
 	
-	for (int j = 0; j < _NY; ++j) {
-		for (int i = 0; i < _NX; ++i) {
+	for (int j = 0; j < NY; ++j) {
+		for (int i = 0; i < NX; ++i) {
+			
+			vector(Wn1, i, j, WM);
+			
+			if (i == 0) {
+				real xx = (i + 0.5) / NX;
+				real yy = (j + 0.5) / NY;
+				real x, y;
+				Ref2PhysMap(&xx, &yy, &x, &y);
+				Wexact(&x, &y, WL);
+			} else {
+				vector(Wn1, i - 1, j, WL);
+			}
+			
+			if (i == NX - 1) {
+				real xx = (i + 0.5) / NX;
+				real yy = (j + 0.5) / NY;
+				real x, y;
+				Ref2PhysMap(&xx, &yy, &x, &y);
+				Wexact(&x, &y, WR);
+			}
+			else {
+				vector(Wn1, i + 1, j, WR);
+			}
+			
+			if (j == 0) {
+				real xx = (i + 0.5) / NX;
+				real yy = (j + 0.5) / NY;
+				real x, y;
+				Ref2PhysMap(&xx, &yy, &x, &y);
+				Wexact(&x, &y, WD);
+			} else {
+				vector(Wn1, i, j - 1, WD);
+			}
+			
+			if (j == NY - 1) {
+				real xx = (i + 0.5) / NX;
+				real yy = (j + 0.5) / NY;
+				real x, y;
+				Ref2PhysMap(&xx, &yy, &x, &y);
+				Wexact(&x, &y, WU);
+			}
+			else {
+				vector(Wn1, i, j + 1, WU);
+			}
+			
+			flux(WL, WM, vnX, fluxLM);
+			flux(WM, WR, vnX, fluxMR);
+			flux(WD, WM, vnX, fluxDM);
+			flux(WM, WU, vnX, fluxMU);
+			
 			for (int k = 0; k < _M; ++k) {
-				WM[k] = Wn1[i + k * _NX * _NY + j * _NX];
-				
-				if (i == 0) {
-					real xx = 1. / _NX * (i + 0.5);
-					real yy = 1. / _NY * (j + 0.5);
-					real x, y;
-					Ref2PhysMap(&xx, &yy, &x, &y);
-					
-					Wexact(&x, &y, WL);
-					//WL[k] = 0;
-					WR[k] = Wn1[i + 1 + k * _NX * _NY + j * _NX];
-				}
-				else if (i == _NX - 1) {
-					real xx = 1. / _NX * (i + 0.5);
-					real yy = 1. / _NY * (j + 0.5);
-					real x, y;
-					Ref2PhysMap(&xx, &yy, &x, &y);
-					
-					WL[k] = Wn1[i - 1 + k * _NX * _NY + j * _NX];
-					Wexact(&x, &y, WR);
-					//WR[k] = 0;
-				}
-				else {
-					WL[k] = Wn1[i - 1 + k * _NX * _NY + j * _NX];
-					WR[k] = Wn1[i + 1 + k * _NX * _NY + j * _NX];
-				}
-				
-				if (j == 0) {
-					real xx = 1. / _NX * (i + 0.5);
-					real yy = 1. / _NY * (j + 0.5);
-					real x, y;
-					Ref2PhysMap(&xx, &yy, &x, &y);
-					
-					Wexact(&x, &y, WU);
-					WD[k] = Wn1[i + k * _NX * _NY + (j + 1) * _NX];
-				}
-				else if (j == _NY - 1) {
-					real xx = 1. / _NX * (i + 0.5);
-					real yy = 1. / _NY * (j + 0.5);
-					real x, y;
-					Ref2PhysMap(&xx, &yy, &x, &y);
-					
-					WU[k] = Wn1[i + k * _NX * _NY + (j - 1) * _NX];
-					Wexact(&x, &y, WD);
-				}
-				else {
-					WU[k] = Wn1[i + k * _NX * _NY + (j - 1) * _NX];
-					WD[k] = Wn1[i + k * _NX * _NY + (j + 1) * _NX];
-				}				
-				
-				flux(WL, WM, vnX, fluxLM);
-				flux(WM, WR, vnX, fluxMR);
-				flux(WU, WM, vnX, fluxUM);
-				flux(WM, WD, vnX, fluxMD);
-				
-				int n = i + k * _NX * _NY + j * _NX;
-				Wn2[n] = Wn1[n] - *dtt/dx * (fluxMR[n] - fluxLM[n]) - *dtt/dy * (fluxUM[n] - fluxMD[n]);
+				int n = i + k * NX * NY + j * NX;
+				Wn2[n] = WM[k] - (*dtt)/dx * (fluxMR[k] - fluxLM[k]) - (*dtt)/dy * (fluxMU[k] - fluxDM[k]);
 			}
 		}
 	}
 	
-	for (int i = 0; i < _NX * _NY * _M; ++i)
+	for (int i = 0; i < NX * NY * _M; ++i) {
 		Wn1[i] = Wn2[i];
+	}
 }
 // }}}
