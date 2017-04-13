@@ -10,6 +10,8 @@ TARGETS = $(TARGET-1D) $(TARGET-2D)
 
 all: $(TARGETS)
 
+new: clean all
+
 %.o: %.c %.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 	
