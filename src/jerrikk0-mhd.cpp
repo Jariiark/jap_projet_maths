@@ -192,6 +192,7 @@ void TimeStepCPU_2D(real *Wn1, real *dtt)
 	real fluxDM[_M];
 	real fluxMU[_M];
 	real vnX[3] = {1, 0, 0};
+	real vnY[3] = {0, 1, 0};
 	real dx = _LONGUEURX * 1. / _NBWORKSX;
 	real dy = _LONGUEURY * 1. / _NBWORKSY;
 	int NX = _NXTRANSBLOCK;
@@ -249,8 +250,8 @@ void TimeStepCPU_2D(real *Wn1, real *dtt)
 			
 			flux(WL, WM, vnX, fluxLM);
 			flux(WM, WR, vnX, fluxMR);
-			flux(WD, WM, vnX, fluxDM);
-			flux(WM, WU, vnX, fluxMU);
+			flux(WD, WM, vnY, fluxDM);
+			flux(WM, WU, vnY, fluxMU);
 			
 			for (int k = 0; k < _M; ++k) {
 				int n = i + k * NX * NY + j * NX;
